@@ -1,4 +1,3 @@
-```markdown
 # Oasis Bot - Provider Management Script
 
 ## 📄 Deskripsi
@@ -16,34 +15,21 @@ Skrip ini memanfaatkan **Node.js** dengan **Axios** sebagai library HTTP.
 
 Ikuti langkah-langkah berikut untuk menginstal dan menjalankan skrip ini:
 
-### 1. Persiapan Proyek
-1. Buat folder proyek baru untuk menyimpan file skrip.
-2. Masuk ke folder proyek tersebut menggunakan terminal:
-   ```bash
-   cd [nama-folder-proyek]
-   ```
-
----
-
-### 2. Buat File `delete.js`
+### 1. Buat File `delete.js`
 1. Buat file baru bernama `delete.js` di dalam folder proyek oasis-bot kalian.
 2. Salin kode `delete.js` di projeck ini  kedalam file `delete.js` kalian
 
 ---
 
-### 3. Install Axios
-1. Inisialisasi proyek Node.js:
-   ```bash
-   npm init -y
-   ```
-2. Install library **Axios**:
+### 2. Install Axios
+1. Install library **Axios**:
    ```bash
    npm install axios
    ```
 
 ---
 
-### 4. Pastikan File `tokens.txt` berisi token oasis
+### 3. Pastikan File `tokens.txt` berisi token oasis
 jikalau tidak ada File `tokens.txt` atau filenya kosong silahkan generate dulu tokennya dengan
 ```bash
 npm run setup
@@ -51,7 +37,7 @@ npm run setup
 
 ---
 
-### 5. Jalankan Skrip
+### 4. Jalankan Skrip
 1. Jalankan skrip menggunakan Node.js:
    ```bash
    node delete.js
