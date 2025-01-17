@@ -1,78 +1,90 @@
-```markdown
-# Oasis Bot - Provider Management Script
+---
 
-## 📄 Deskripsi
-
-Skrip ini digunakan untuk mengelola provider yang terdaftar di API Oasis.ai. Dengan bot ini, Anda dapat:
-- Membaca token dari file `tokens.txt`.
-- Mengambil daftar provider yang tersedia.
-- Menghapus provider secara otomatis berdasarkan ID.
-
-Skrip ini memanfaatkan **Node.js** dengan **Axios** sebagai library HTTP.
+<p align="center">Manage providers registered on the Oasis.ai API with ease using Oasis Bot!</p>
 
 ---
 
-## 📥 Tutorial Instalasi
+## 🚀 **About the Bot**
 
-Ikuti langkah-langkah berikut untuk menginstal dan menjalankan skrip ini:
+Oasis Bot is a powerful script designed to manage providers on the **Oasis.ai API**. With this bot, you can:
 
-### 1. Persiapan Proyek
-1. Buat folder proyek baru untuk menyimpan file skrip.
-2. Masuk ke folder proyek tersebut menggunakan terminal:
+- Read tokens from the `tokens.txt` file.
+- Retrieve a list of available providers.
+- Automatically delete providers based on their ID.
+
+This script is built using **Node.js** and leverages **Axios** as the HTTP request library.
+
+---
+
+## 📥 **Installation Guide**
+
+Follow these steps to install and run the script:
+
+### 1️⃣ **Set Up Your Project**
+
+1. Create a new folder to store the script files.
+2. Navigate to the project folder in your terminal:
    ```bash
-   cd [nama-folder-proyek]
+   cd [your-project-folder]
    ```
 
 ---
 
-### 2. Buat File `delete.js`
-1. Buat file baru bernama `delete.js` di dalam folder proyek oasis-bot kalian.
-2. Salin kode `delete.js` di projeck ini  kedalam file `delete.js` kalian
+### 2️⃣ **Create the `delete.js` File**
+
+1. Inside your project folder, create a new file named `delete.js`.
+2. Copy the `delete.js` script provided in this repository into your file.
 
 ---
 
-### 3. Install Axios
-1. Inisialisasi proyek Node.js:
+### 3️⃣ **Install Dependencies**
+
+1. Initialize a new Node.js project:
    ```bash
    npm init -y
    ```
-2. Install library **Axios**:
+2. Install the required libraries (**Axios, fs, path, chalk**):
    ```bash
-   npm install axios
+   npm install fs path axios chalk
    ```
 
 ---
 
-### 4. Pastikan File `tokens.txt` berisi token oasis
-jikalau tidak ada File `tokens.txt` atau filenya kosong silahkan generate dulu tokennya dengan
+### 4️⃣ **Ensure `tokens.txt` Contains Your Oasis API Token**
+
+If `tokens.txt` is missing or empty, generate a new token by running:
+
 ```bash
 npm run setup
 ```
 
 ---
 
-### 5. Jalankan Skrip
-1. Jalankan skrip menggunakan Node.js:
+### 5️⃣ **Run the Script**
+
+1. Execute the script using Node.js:
    ```bash
    node delete.js
    ```
-2. Skrip akan membaca token dari `tokens.txt`, mengambil daftar provider, dan menghapusnya secara otomatis.
+2. The script will read the token from `tokens.txt`, fetch the provider list, and delete providers automatically.
 
 ---
 
-## ⚠️ Catatan Penting
-- **Token Harus Valid**: Pastikan token yang digunakan masih aktif untuk mengakses API Oasis.ai.
-- **Edit File Jika Diperlukan**: Sesuaikan URL atau parameter API jika ada perubahan di endpoint Oasis.ai.
+## ⚠️ **Important Notes**
+
+- **Valid Token Required**: Ensure your API token is active and valid for Oasis.ai.
+- **Modify If Necessary**: Adjust API URLs or parameters as needed if Oasis.ai updates its endpoints.
 
 ---
 
-## 🛠️ Kontribusi
-Jika Anda ingin menambahkan fitur atau melaporkan masalah, jangan ragu untuk membuat pull request atau membuka issue di repository proyek ini.
+## 🛠️ **Contributing**
 
-Selamat mencoba! 🚀
+Want to add new features or report issues? Feel free to create a pull request or open an issue in the repository.
+
+Happy coding! 🚀
+
 <div align="center">
   <a href="https://t.me/livexordsscript" target="_blank">
     <img src="https://img.shields.io/static/v1?message=Livexords&logo=telegram&label=&color=2CA5E0&logoColor=white&labelColor=&style=for-the-badge" height="25" alt="telegram logo" />
   </a>
 </div>
-```

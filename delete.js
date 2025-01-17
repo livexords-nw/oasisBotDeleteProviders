@@ -1,111 +1,153 @@
 import axios from "axios";
 import fs from "fs";
+import path from "path";
+import chalk from "chalk";
 
+// Utility for timestamped logs
+function getTimestamp() {
+  const now = new Date();
+  return now.toISOString().replace("T", " ~ ").slice(0, 19);
+}
+
+// Log utilities with timestamp, emoji, and colors
+function logError(message) {
+  console.error(
+    `${chalk.red("❌")} [${chalk.gray(getTimestamp())}] ${chalk.red(
+      "[ERROR]"
+    )} ${message}`
+  );
+}
+
+function logSuccess(message) {
+  console.log(
+    `${chalk.green("✅")} [${chalk.gray(getTimestamp())}] ${chalk.green(
+      "[SUCCESS]"
+    )} ${message}`
+  );
+}
+
+function logInfo(message) {
+  console.log(
+    `${chalk.blue("ℹ️")} [${chalk.gray(getTimestamp())}] ${chalk.blue(
+      "[INFO]"
+    )} ${message}`
+  );
+}
+
+// Reads tokens from a file and trims/validates them
 async function readTokens(filePath) {
   try {
-    const data = fs.readFileSync(filePath, "utf-8");
+    const absolutePath = path.resolve(filePath);
+    logInfo(`Reading tokens from: ${absolutePath}`);
+    const data = fs.readFileSync(absolutePath, "utf-8");
     return data
       .split("\n")
       .map((token) => token.trim())
-      .filter((token) => token.length > 0);A
+      .filter((token) => token.length > 0);
   } catch (error) {
-    console.error(`Error reading tokens from ${filePath}: ${error.message}`);
+    logError(`Unable to read tokens from ${filePath}: ${error.message}`);
     return [];
   }
 }
 
+// Fetches a list of provider IDs using the provided token
 async function fetchProviderList(token) {
-  const url =
-    "https://api.oasis.ai/internal/providerList,providerList,providerPointsTimeseries,settingsProfile?batch=1";
-  const input =
-    "%7B%220%22%3A%7B%22json%22%3A%7B%22offset%22%3A0%2C%22limit%22%3A10%2C%22sortBy%22%3A%22latest%22%7D%7D%2C%221%22%3A%7B%22json%22%3A%7B%22offset%22%3A0%2C%22limit%22%3A10%2C%22sortBy%22%3A%22latest%22%7D%7D%2C%222%22%3A%7B%22json%22%3A%7B%22interval%22%3A%22week%22%7D%7D%2C%223%22%3A%7B%22json%22%3Anull%2C%22meta%22%3A%7B%22values%22%3A%5B%22undefined%22%5D%7D%7D%7D";
+  const url = "https://api.oasis.ai/internal/provider/providers";
+  const params = {
+    limit: 5,
+    offset: 0,
+    sortBy: "latest",
+  };
   const headers = {
     Authorization: token,
     "Content-Type": "application/json",
   };
 
   try {
-    const response = await axios.get(`${url}&input=${input}`, { headers });
-    const results = response.data[0].result.data.json.results;
+    logInfo("Fetching provider list...");
+    const response = await axios.get(url, { headers, params });
+    const results = response.data.results || [];
+    logSuccess(`Found ${results.length} providers.`);
     return results.map((item) => item.id);
   } catch (error) {
-    console.error(
-      `Failed to fetch provider list: ${
-        error.response ? error.response.status : error.message
-      }`
-    );
+    const errorMsg =
+      error.response && error.response.status
+        ? `HTTP ${error.response.status}`
+        : error.message;
+    logError(`Failed to fetch provider list: ${errorMsg}`);
     return [];
   }
 }
 
+// Deletes a provider by its ID
 async function deleteProviderById(token, id) {
-  const url = "https://api.oasis.ai/internal/providerDelete?batch=1";
-  const payload = {
-    0: { json: { id } },
-  };
+  const url = `https://api.oasis.ai/internal/provider/?id=${id}`;
+  const params = { id };
   const headers = {
     Authorization: token,
     "Content-Type": "application/json",
   };
 
   try {
-    const response = await axios.post(url, payload, { headers });
-    console.log(`Deleted provider ID: ${id} - Status: ${response.status}`);
-    return response.data;
+    logInfo(`Deleting provider with ID: ${id}`);
+    const response = await axios.delete(url, { headers, data: params });
+    logSuccess(`Deleted provider ID: ${id} - HTTP Status: ${response.status}`);
+    return true;
   } catch (error) {
-    console.error(
-      `Failed to delete provider ID: ${id} - Error: ${
-        error.response ? error.response.status : error.message
-      }`
-    );
-    return null;
+    const errorMsg =
+      error.response && error.response.status
+        ? `HTTP ${error.response.status}`
+        : error.message;
+    logError(`Failed to delete provider ID: ${id} - Error: ${errorMsg}`);
+    return false;
   }
 }
 
+// Main function to orchestrate reading tokens and deleting providers
 export async function readAndDelete() {
+  logInfo("Starting the token and provider deletion process...");
+
   while (true) {
     try {
       const tokens = await readTokens("tokens.txt");
       if (tokens.length === 0) {
-        console.log("No tokens found in tokens.txt.");
+        logInfo("No valid tokens found in tokens.txt. Exiting...");
         break;
       }
 
-      let providerFound = false;
+      let providersDeleted = false;
 
       for (const token of tokens) {
-        console.log(`Using token: ${token}`);
+        logInfo(`Processing token: ${chalk.cyan(token)}`);
 
         const ids = await fetchProviderList(token);
 
         if (ids.length === 0) {
-          console.log("No providers found to delete.");
-          continue; 
+          logInfo("No providers found for this token.");
+          continue;
         }
 
-        providerFound = true;
-
         for (const id of ids) {
-          console.log(`Attempting to delete provider ID: ${id}`);
-          const result = await deleteProviderById(token, id);
-          if (result) {
-            console.log(`Successfully deleted provider ID: ${id}`);
-          } else {
-            console.log(`Failed to delete provider ID: ${id}`);
-          }
+          const success = await deleteProviderById(token, id);
+          providersDeleted ||= success;
         }
       }
 
-      if (!providerFound) {
-        console.log("No provider found to delete. Exiting...");
+      if (!providersDeleted) {
+        logInfo("No providers were deleted. Exiting...");
         break;
       }
     } catch (error) {
-      console.error(`Error during operation: ${error.message}`);
+      logError(`An unexpected error occurred: ${error.message}`);
     }
   }
+
+  logSuccess("Process completed successfully.");
 }
 
+// Entry point for standalone execution
 if (import.meta.url === new URL(import.meta.url).href) {
-  readAndDelete();
+  readAndDelete().catch((error) =>
+    logError(`Critical failure: ${error.message}`)
+  );
 }
